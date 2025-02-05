@@ -6,12 +6,12 @@ namespace SwmsServiceLibrary
     {
         private static readonly string _configPath = "appsettings.json";
 
-        public EnvironmentVariableService()
+        static EnvironmentVariableService()
         {
             EnsureConfigFileExists();
         }
 
-        private void EnsureConfigFileExists()
+        private static void EnsureConfigFileExists()
         {
             if (!File.Exists(_configPath))
             {
