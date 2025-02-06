@@ -4,7 +4,7 @@ namespace SwmsServiceLibrary
 {
     public class EnvironmentVariableService
     {
-        private static readonly string _configPath = "appsettings.json";
+        private static readonly string _configPath = "config/environment.json";
 
         static EnvironmentVariableService()
         {
@@ -15,12 +15,12 @@ namespace SwmsServiceLibrary
         {
             try
             {
-            if (!File.Exists(_configPath))
-            {
-                var defaultConfig = new JObject(new JObject());
-                File.WriteAllText(_configPath, defaultConfig.ToString());
+                if (!File.Exists(_configPath))
+                {
+                    var defaultConfig = new JObject(new JObject());
+                    File.WriteAllText(_configPath, defaultConfig.ToString());
+                }
             }
-        }
             catch (Exception ex)
             {
                 Console.WriteLine($"EnvironmentVariableService EnsureConfigFileExists: {ex.Message}");
@@ -47,16 +47,16 @@ namespace SwmsServiceLibrary
         {
             try
             {
-            var config = JObject.Parse(File.ReadAllText(_configPath));
+                var config = JObject.Parse(File.ReadAllText(_configPath));
 
-            if (config["EnvironmentVariables"] == null)
-            {
-                config["EnvironmentVariables"] = new JObject();
+                if (config["EnvironmentVariables"] == null)
+                {
+                    config["EnvironmentVariables"] = new JObject();
+                }
+
+                config["EnvironmentVariables"][key] = value;
+                File.WriteAllText(_configPath, config.ToString());
             }
-
-            config["EnvironmentVariables"][key] = value;
-            File.WriteAllText(_configPath, config.ToString());
-        }
             catch (Exception ex)
             {
                 Console.WriteLine($"EnvironmentVariableService SaveEnvironmentVariable: {ex.Message}");
