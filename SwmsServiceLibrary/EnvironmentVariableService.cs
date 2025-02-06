@@ -43,6 +43,21 @@ namespace SwmsServiceLibrary
             return savedValue ?? GetRequiredStringFromENV(variableName);
         }
 
+        /// <summary>
+        /// To persist environment variables across container restarts, use a named volume.
+        /// <example>
+        /// <code>
+        /// application_name:
+        ///     image: some_image
+        ///     volumes:
+        ///       - app_data:/app/config
+        ///
+        /// volumes:
+        ///    app_data:
+        /// </code>
+        /// </example>
+        /// This setup mounts a named volume 'app_data' to '/app/config' in the container.
+        /// </summary>
         public static void SaveEnvironmentVariable(string key, string value)
         {
             try
