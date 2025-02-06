@@ -13,10 +13,17 @@ namespace SwmsServiceLibrary
 
         private static void EnsureConfigFileExists()
         {
+            try
+            {
             if (!File.Exists(_configPath))
             {
                 var defaultConfig = new JObject(new JObject());
                 File.WriteAllText(_configPath, defaultConfig.ToString());
+            }
+        }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"EnvironmentVariableService EnsureConfigFileExists: {ex.Message}");
             }
         }
 
@@ -38,6 +45,8 @@ namespace SwmsServiceLibrary
 
         public static void SaveEnvironmentVariable(string key, string value)
         {
+            try
+            {
             var config = JObject.Parse(File.ReadAllText(_configPath));
 
             if (config["EnvironmentVariables"] == null)
@@ -47,6 +56,11 @@ namespace SwmsServiceLibrary
 
             config["EnvironmentVariables"][key] = value;
             File.WriteAllText(_configPath, config.ToString());
+        }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"EnvironmentVariableService SaveEnvironmentVariable: {ex.Message}");
+            }
         }
 
         public void LoadFromEnvironment()
