@@ -27,7 +27,7 @@ namespace SwmsServiceLibrary
             }
         }
 
-        public static string GetSavedEnvironmentVariable(string key)
+        public static string? GetSavedEnvironmentVariable(string key)
         {
             if (File.Exists(_configPath))
             {
@@ -37,10 +37,24 @@ namespace SwmsServiceLibrary
             return null;
         }
 
-        public static string GetEnvironmentVariable(string variableName)
+        public static string? GetStringEnvironmentVariable(string variableName, bool required)
         {
             var savedValue = GetSavedEnvironmentVariable(variableName);
-            return savedValue ?? GetRequiredStringFromENV(variableName);
+            return savedValue ?? GetStringFromENV(variableName, required);
+        }
+
+        public static bool? GetBoolEnvironmentVariable(string variableName, bool required)
+        {
+            string? savedValue = GetSavedEnvironmentVariable(variableName);
+            bool isValidBoolean = bool.TryParse(savedValue, out bool result);
+            return isValidBoolean ? result : GetBoolFromENV(variableName, required);
+        }
+
+        public static int? GetIntEnvironmentVariable(string variableName, bool required)
+        {
+            string? savedValue = GetSavedEnvironmentVariable(variableName);
+            bool isValidInt = int.TryParse(savedValue, out int result);
+            return isValidInt ? result : GetIntFromENV(variableName, required);
         }
 
         /// <summary>
@@ -112,6 +126,61 @@ namespace SwmsServiceLibrary
         {
             var envString = Environment.GetEnvironmentVariable(variableName);
             return envString == null ? throw new ArgumentException($"ENV variable {variableName} is missing!") : envString;
+        }
+
+        public static string? GetStringFromENV(string variableName, bool required)
+        {
+            return GetENV(variableName, required);
+        }
+
+        public static int? GetIntFromENV(string variableName, bool required)
+        {
+            var envString = GetENV(variableName, required);
+
+            if (envString == null)
+            {
+                return null;
+            }
+
+            var isValidInt = int.TryParse(envString, out int result);
+
+            if (isValidInt)
+            {
+                return result;
+            }
+            
+            throw new ArgumentException($"ENV variable {variableName} is not a valid int! Value '{envString}'");
+        }
+
+        public static bool? GetBoolFromENV(string variableName, bool required)
+        {
+            var envString = GetENV(variableName, required);
+
+            if (envString == null)
+            {
+                return null;
+            }
+
+            var isValidBool = bool.TryParse(envString, out bool result);
+
+            if (isValidBool)
+            {
+                return result;
+            }
+
+            throw new ArgumentException($"ENV variable {variableName} is not a valid bool! Value '{envString}'");
+
+        }
+
+        private static string? GetENV(string variableName, bool required)
+        {
+            var envString = Environment.GetEnvironmentVariable(variableName);
+
+            if (required && envString == null)
+            {
+                throw new ArgumentException($"ENV variable {variableName} is missing!");
+            }
+            return envString;
         }
 
     }
